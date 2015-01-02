@@ -1,0 +1,10 @@
+[Unit]
+Description=Docker Zeroconf registering
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python %h/bin/avahi-docker.py
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
