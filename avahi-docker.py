@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 import docker
 import json
 import subprocess
+import socket
 from datetime import datetime, timedelta
 from functools import wraps
 from threading import Timer
@@ -45,6 +46,8 @@ class throttle(object):
 
 running = []
 
+hostname = socket.gethostname()
+
 @throttle(seconds=0.5)
 def register_avahi():
     print("Registering on Avahi...")
@@ -58,7 +61,8 @@ def register_avahi():
     containers = c.containers()
     for cont in containers:
         info = c.inspect_container(cont['Id'])
-        cmd = ['avahi-publish-address', '-a', info['Name'][1:]+'.local', info['NetworkSettings']['IPAddress']]
+        containername = hostname + '_' + info['Name'][1:]+'.local'
+        cmd = ['avahi-publish-address', '-a', containername, info['NetworkSettings']['IPAddress']]
         r = subprocess.Popen(cmd)
         running.append(r)
 
