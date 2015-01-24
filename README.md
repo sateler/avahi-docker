@@ -21,7 +21,7 @@ Installation
     systemctl --user enable avahi-docker
     systemctl --user start avahi-docker
 
-Now your local running docker containers are available at eg, `http://my_container_name.local`
+Now your local running docker containers are available at eg, `http://hostname_my_container_name.local`
 
 
 
