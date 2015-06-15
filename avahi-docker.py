@@ -62,7 +62,7 @@ def register_avahi():
     for cont in containers:
         info = c.inspect_container(cont['Id'])
         containername = hostname + '_' + info['Name'][1:]+'.local'
-        cmd = ['avahi-publish-address', '-a', containername, info['NetworkSettings']['IPAddress']]
+        cmd = ['avahi-publish', '--no-reverse', '-a', containername, info['NetworkSettings']['IPAddress']]
         r = subprocess.Popen(cmd)
         running.append(r)
 
