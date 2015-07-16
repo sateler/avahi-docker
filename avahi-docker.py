@@ -48,6 +48,11 @@ running = []
 
 hostname = socket.gethostname()
 
+def publish(containername, ip):
+    cmd = ['avahi-publish', '--no-reverse', '-a', containername, ip]
+    r = subprocess.Popen(cmd)
+    running.append(r)
+
 @throttle(seconds=0.5)
 def register_avahi():
     print("Registering on Avahi...")
@@ -61,10 +66,9 @@ def register_avahi():
     containers = c.containers()
     for cont in containers:
         info = c.inspect_container(cont['Id'])
-        containername = hostname + '_' + info['Name'][1:]+'.local'
-        cmd = ['avahi-publish', '--no-reverse', '-a', containername, info['NetworkSettings']['IPAddress']]
-        r = subprocess.Popen(cmd)
-        running.append(r)
+        ip = info['NetworkSettings']['IPAddress']
+        publish(hostname + '_' + info['Name'][1:]+'.local', ip)
+        publish(info['Name'][1:] + '.' + hostname + '.local', ip)
 
 # Initial setup
 register_avahi()
