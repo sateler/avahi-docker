@@ -5,6 +5,7 @@ import json
 import subprocess
 import socket
 import argparse
+import signal
 from datetime import datetime, timedelta
 from functools import wraps
 from threading import Timer
@@ -51,16 +52,30 @@ def publish(containername, ip):
     r = subprocess.Popen(cmd)
     running.append(r)
 
+def kill_avahis():
+    global running
+    for r in running:
+        try:
+            r.terminate()
+        except:
+            pass
+
+    for r in running:
+        if r.returncode is not None:
+            continue
+        try:
+            r.wait(timeout=5)
+        except TimeoutError:
+            r.kill()
+
+    running = []
+
+
 @throttle(seconds=0.5)
 def register_avahi():
     print("Registering on Avahi...")
-    global running, c
-    for r in running:
-        try:
-            r.kill()
-        except:
-            pass
-    running = []
+    global c
+    kill_avahis()
     containers = c.containers()
     for cont in containers:
         info = c.inspect_container(cont['Id'])
@@ -95,6 +110,13 @@ def parse_args():
     return
 
 parse_args()
+
+def sigterm_handler(_signum, _stack_frame):
+    print("Exiting...")
+    kill_avahis()
+    exit(0)
+
+signal.signal(signal.SIGTERM, sigterm_handler)
 
 for event_json in c.events():
     event = json.loads(event_json)
