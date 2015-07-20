@@ -1,7 +1,4 @@
-#!/usr/bin/python
-
-from __future__ import print_function
-from __future__ import unicode_literals
+#!/usr/bin/python3
 
 import docker
 import json
