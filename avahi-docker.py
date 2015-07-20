@@ -7,6 +7,7 @@ import docker
 import json
 import subprocess
 import socket
+import argparse
 from datetime import datetime, timedelta
 from functools import wraps
 from threading import Timer
@@ -70,8 +71,32 @@ def register_avahi():
         publish(hostname + '_' + info['Name'][1:]+'.local', ip)
         publish(info['Name'][1:] + '.' + hostname + '.local', ip)
 
-# Initial setup
-register_avahi()
+def list_avahi():
+    cmd = ['docker','ps']
+    r = subprocess.check_output(cmd)
+    lines = r.split("\n")
+    for line in lines:
+        try: 
+            host = line.rsplit(None, 1)[-1]
+            if host == "NAMES":
+                continue
+            print("http://"+socket.gethostname()+"_"+host+".local/")
+        except:
+            continue
+
+# parse args
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-l", "--list", help="just list domains", action="store_true")
+    args = parser.parse_args()
+    if args.list:
+        list_avahi()
+        exit()
+    else:
+        register_avahi()
+    return
+
+parse_args()
 
 for event_json in c.events():
     event = json.loads(event_json)
