@@ -84,18 +84,11 @@ def register_avahi():
         publish(info['Name'][1:] + '.' + hostname + '.local', ip)
 
 def list_avahi():
-    cmd = ['docker','ps']
-    r = subprocess.check_output(cmd)
-    lines = r.split("\n")
-    for line in lines:
-        try: 
-            host = line.rsplit(None, 1)[-1]
-            if host == "NAMES":
-                continue
-            print("http://"+hostname+"_"+host+".local/")
-            print("http://"+host+"."+hostname+".local/")
-        except:
-            continue
+    for cont in c.containers():
+        info = c.inspect_container(cont['Id'])
+        host = info['Name'][1:]
+        print("http://"+hostname+"_"+host+".local/")
+        print("http://"+host+"."+hostname+".local/")
 
 # parse args
 def parse_args():
