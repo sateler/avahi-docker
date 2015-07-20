@@ -77,7 +77,8 @@ def list_avahi():
             host = line.rsplit(None, 1)[-1]
             if host == "NAMES":
                 continue
-            print("http://"+socket.gethostname()+"_"+host+".local/")
+            print("http://"+hostname+"_"+host+".local/")
+            print("http://"+host+"."+hostname+".local/")
         except:
             continue
 
