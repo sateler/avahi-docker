@@ -9,8 +9,7 @@ import signal
 from datetime import datetime, timedelta
 from functools import wraps
 from threading import Timer
-
-c = docker.Client()
+from systemd import daemon
 
 class throttle(object):
     """
@@ -46,6 +45,7 @@ class throttle(object):
 running = []
 
 hostname = socket.gethostname()
+c = docker.Client()
 
 def publish(containername, ip):
     cmd = ['avahi-publish', '--no-reverse', '-a', containername, ip]
@@ -113,10 +113,13 @@ parse_args()
 
 def sigterm_handler(_signum, _stack_frame):
     print("Exiting...")
+    daemon.notify("STOPPING=1")
     kill_avahis()
     exit(0)
 
 signal.signal(signal.SIGTERM, sigterm_handler)
+
+daemon.notify("READY=1")
 
 for event_json in c.events():
     event = json.loads(event_json)

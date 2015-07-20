@@ -2,8 +2,8 @@
 Description=Docker Zeroconf registering
 
 [Service]
-Type=simple
-ExecStart=/usr/bin/python %h/bin/avahi-docker.py
+Type=notify
+ExecStart=/usr/bin/python3 %h/bin/avahi-docker.py
 Restart=on-failure
 
 [Install]
