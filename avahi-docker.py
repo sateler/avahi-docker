@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import docker
-import json
 import subprocess
 import socket
 import argparse
@@ -114,7 +113,6 @@ signal.signal(signal.SIGTERM, sigterm_handler)
 
 daemon.notify("READY=1")
 
-for event_json in c.events():
-    event = json.loads(event_json)
+for event in c.events(decode=True):
     if event['status'] in ('die', 'stop', 'create', 'start'):
         register_avahi()

@@ -6,7 +6,7 @@ Registers running instances with avahi, for easy local usage of ran containers.
 Requirements:
 
 * python3
-* python-docker
+* python-docker (>= 1.0.0)
 * avahi-utils
 
 Installation
