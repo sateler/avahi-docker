@@ -5,6 +5,7 @@ import subprocess
 import socket
 import argparse
 import signal
+import itertools
 from datetime import datetime, timedelta
 from functools import wraps
 from threading import Timer
@@ -78,9 +79,16 @@ def register_avahi():
     containers = c.containers()
     for cont in containers:
         info = c.inspect_container(cont['Id'])
-        ip = info['NetworkSettings']['IPAddress']
-        publish(hostname + '_' + info['Name'][1:]+'.local', ip)
-        publish(info['Name'][1:] + '.' + hostname + '.local', ip)
+        hostnames = (
+            hostname + '_' + info['Name'][1:]+'.local',
+            info['Name'][1:] + '.' + hostname + '.local',
+        )
+        ips = [info['NetworkSettings']['IPAddress']]
+        ip6 = info['NetworkSettings']['GlobalIPv6Address']
+        if ip6:
+            ips.append(ip6)
+        for containername, ip in itertools.product(hostnames, ips):
+            publish(containername, ip)
 
 def list_avahi():
     for cont in c.containers():
